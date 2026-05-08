@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { sql } from "@/lib/db"
 import { getSession } from "@/lib/session"
+import { checkoutCart } from "@/lib/store"
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,45 +16,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
     }
 
-    let totalPrice = 0
-
-    const orderResult = await sql`
-      INSERT INTO orders (user_id, status, total_price) 
-      VALUES (${session.userId}, 'completed', 0) 
-      RETURNING id
-    `
-
-    const orderId = orderResult[0].id
-
-    // Add order items
     for (const item of items) {
-      const productResult = await sql`SELECT price FROM products WHERE id = ${item.productId}`
-
-      if (productResult.length === 0) {
-        return NextResponse.json({ error: `Product ${item.productId} not found` }, { status: 404 })
+      if (!Number.isInteger(item.productId) || !Number.isInteger(item.quantity) || item.quantity <= 0) {
+        return NextResponse.json({ error: "Invalid cart item" }, { status: 400 })
       }
-
-      const price = Number.parseFloat(productResult[0].price)
-      const itemTotal = price * item.quantity
-      totalPrice += itemTotal
-
-      await sql`
-        INSERT INTO order_items (order_id, product_id, quantity, price) 
-        VALUES (${orderId}, ${item.productId}, ${item.quantity}, ${price})
-      `
-
-      await sql`
-        UPDATE products 
-        SET stock = stock - ${item.quantity} 
-        WHERE id = ${item.productId}
-      `
     }
 
-    await sql`
-      UPDATE orders 
-      SET total_price = ${totalPrice} 
-      WHERE id = ${orderId}
-    `
+    const { orderId, totalPrice } = await checkoutCart(session.userId, items)
 
     return NextResponse.json({
       success: true,
@@ -63,6 +31,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Checkout error:", error)
-    return NextResponse.json({ error: "Checkout failed" }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Checkout failed" }, { status: 400 })
   }
 }

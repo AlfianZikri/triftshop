@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Download, Package } from "lucide-react"
+import { ArrowLeft, Download, Package, ReceiptText } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface OrderItem {
@@ -85,8 +85,8 @@ Total: $${order.total_price.toFixed(2)}
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b bg-card shadow-sm">
+        <div className="container mx-auto flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold">Order History</h1>
             <p className="text-muted-foreground mt-1">View and manage your purchases</p>
@@ -101,7 +101,7 @@ Total: $${order.total_price.toFixed(2)}
       <main className="container mx-auto px-4 py-8">
         {loading ? (
           <div className="text-center py-12">
-            <p>Loading your orders...</p>
+            <p className="rounded-lg border bg-muted p-4 text-sm font-medium">Loading your orders...</p>
           </div>
         ) : orders.length === 0 ? (
           <Card>
@@ -114,11 +114,14 @@ Total: $${order.total_price.toFixed(2)}
         ) : (
           <div className="space-y-4">
             {orders.map((order) => (
-              <Card key={order.id} className="card-hover">
+              <Card key={order.id} className="card-hover shop-surface">
                 <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <CardTitle className="text-lg">Order #{order.id}</CardTitle>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <ReceiptText className="h-5 w-5 text-primary" />
+                        Order #{order.id}
+                      </CardTitle>
                       <p className="text-sm text-muted-foreground mt-1">
                         {new Date(order.created_at).toLocaleDateString(undefined, {
                           year: "numeric",
@@ -127,7 +130,7 @@ Total: $${order.total_price.toFixed(2)}
                         })}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="sm:text-right">
                       <Badge>{order.status}</Badge>
                       <p className="text-2xl font-bold mt-2">${order.total_price.toFixed(2)}</p>
                     </div>
@@ -136,7 +139,7 @@ Total: $${order.total_price.toFixed(2)}
                 <CardContent>
                   <div className="space-y-2 mb-4">
                     {order.items.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <div key={item.id} className="flex flex-col gap-2 rounded-lg border bg-muted p-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <p className="font-medium">{item.name}</p>
                           <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>

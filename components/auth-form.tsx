@@ -70,14 +70,14 @@ export function AuthForm({ type, onSuccess }: AuthFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md border-2">
-      <CardHeader className="space-y-1">
+    <Card className="w-full border-2 shadow-sm">
+      <CardHeader className="space-y-1 px-4 sm:px-6">
         <CardTitle className="text-2xl">{type === "login" ? "Welcome Back" : "Create Account"}</CardTitle>
         <CardDescription>
-          {type === "login" ? "Sign in to continue shopping" : "Join ThriftShop community"}
+          {type === "login" ? "Sign in to continue shopping" : "Join the ThriftShop community"}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 sm:px-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {type === "register" && (
             <div className="space-y-2">
@@ -107,7 +107,7 @@ export function AuthForm({ type, onSuccess }: AuthFormProps) {
             <Input
               id="password"
               type="password"
-              placeholder="••••••"
+              placeholder="******"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

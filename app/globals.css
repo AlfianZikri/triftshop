@@ -4,31 +4,31 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.2 0 0);
+  --background: oklch(0.976 0.012 96);
+  --foreground: oklch(0.19 0.035 74);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0 0);
+  --card-foreground: oklch(0.18 0.032 74);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0 0);
-  --primary: oklch(0.4 0.15 40);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.75 0.1 140);
-  --secondary-foreground: oklch(0.2 0 0);
-  --muted: oklch(0.92 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.65 0.2 25);
-  --accent-foreground: oklch(0.98 0 0);
+  --popover-foreground: oklch(0.18 0.032 74);
+  --primary: oklch(0.37 0.09 155);
+  --primary-foreground: oklch(0.99 0.006 96);
+  --secondary: oklch(0.86 0.08 78);
+  --secondary-foreground: oklch(0.24 0.04 74);
+  --muted: oklch(0.93 0.018 90);
+  --muted-foreground: oklch(0.45 0.04 75);
+  --accent: oklch(0.58 0.13 35);
+  --accent-foreground: oklch(0.99 0.006 96);
   --destructive: oklch(0.6 0.24 27);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.94 0 0);
-  --ring: oklch(0.4 0.15 40);
+  --border: oklch(0.86 0.022 84);
+  --input: oklch(0.95 0.016 92);
+  --ring: oklch(0.37 0.09 155);
   --chart-1: oklch(0.65 0.2 40);
   --chart-2: oklch(0.55 0.18 280);
   --chart-3: oklch(0.7 0.15 140);
   --chart-4: oklch(0.6 0.2 25);
   --chart-5: oklch(0.5 0.15 180);
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.4 0.15 40);
@@ -75,8 +75,8 @@
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --font-mono: "Cascadia Code", Consolas, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -133,15 +133,19 @@
 }
 
 @layer components {
-  .hero-gradient {
-    @apply bg-gradient-to-b from-primary/10 via-transparent to-transparent;
+  .shop-surface {
+    @apply rounded-lg border bg-card shadow-sm;
+  }
+
+  .hero-panel {
+    @apply rounded-lg border bg-secondary text-secondary-foreground shadow-sm;
   }
 
   .product-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5;
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
   }
 }

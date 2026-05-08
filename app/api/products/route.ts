@@ -1,25 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { sql } from "@/lib/db"
+import { getProducts } from "@/lib/store"
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get("category")
 
-    let products
-    if (category) {
-      products = await sql`
-        SELECT * FROM products 
-        WHERE is_active = true AND category = ${category}
-        ORDER BY created_at DESC
-      `
-    } else {
-      products = await sql`
-        SELECT * FROM products 
-        WHERE is_active = true
-        ORDER BY created_at DESC
-      `
-    }
+    const products = await getProducts(category || undefined)
 
     const formattedProducts = products.map((product: any) => ({
       ...product,

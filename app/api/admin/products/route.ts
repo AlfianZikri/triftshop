@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { sql } from "@/lib/db"
 import { getSession } from "@/lib/session"
+import { createProduct, deleteProduct, getProducts, updateProduct } from "@/lib/store"
 
 // Check if user is admin (simplified - in production use proper roles)
 async function isAdmin(userId: number) {
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const products = await sql`SELECT * FROM products ORDER BY created_at DESC`
+    const products = await getProducts(undefined, true)
     return NextResponse.json(products)
   } catch (error) {
     console.error("Fetch products error:", error)
@@ -33,14 +33,26 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, description, price, category, imageUrl, stock } = await request.json()
+    const cleanName = String(name || "").trim()
+    const cleanCategory = String(category || "").trim()
+    const cleanDescription = String(description || "").trim()
+    const numericPrice = Number(price)
+    const numericStock = Number(stock)
 
-    const result = await sql`
-      INSERT INTO products (name, description, price, category, image_url, stock) 
-      VALUES (${name}, ${description}, ${price}, ${category}, ${imageUrl}, ${stock}) 
-      RETURNING *
-    `
+    if (!cleanName || !cleanCategory || !Number.isFinite(numericPrice) || numericPrice < 0 || !Number.isInteger(numericStock) || numericStock < 0) {
+      return NextResponse.json({ error: "Invalid product data" }, { status: 400 })
+    }
 
-    return NextResponse.json(result[0])
+    const product = await createProduct({
+      name: cleanName,
+      description: cleanDescription,
+      price: numericPrice,
+      category: cleanCategory,
+      imageUrl,
+      stock: numericStock,
+    })
+
+    return NextResponse.json(product)
   } catch (error) {
     console.error("Create product error:", error)
     return NextResponse.json({ error: "Failed to create product" }, { status: 500 })
@@ -56,22 +68,31 @@ export async function PUT(request: NextRequest) {
     }
 
     const { id, name, description, price, category, imageUrl, stock, isActive } = await request.json()
+    const cleanName = String(name || "").trim()
+    const cleanCategory = String(category || "").trim()
+    const cleanDescription = String(description || "").trim()
+    const numericPrice = Number(price)
+    const numericStock = Number(stock)
 
-    const result = await sql`
-      UPDATE products 
-      SET name = ${name}, 
-          description = ${description}, 
-          price = ${price}, 
-          category = ${category}, 
-          image_url = ${imageUrl}, 
-          stock = ${stock}, 
-          is_active = ${isActive}, 
-          updated_at = CURRENT_TIMESTAMP 
-      WHERE id = ${id} 
-      RETURNING *
-    `
+    if (!id || !cleanName || !cleanCategory || !Number.isFinite(numericPrice) || numericPrice < 0 || !Number.isInteger(numericStock) || numericStock < 0) {
+      return NextResponse.json({ error: "Invalid product data" }, { status: 400 })
+    }
 
-    return NextResponse.json(result[0])
+    const product = await updateProduct(Number(id), {
+      name: cleanName,
+      description: cleanDescription,
+      price: numericPrice,
+      category: cleanCategory,
+      imageUrl,
+      stock: numericStock,
+      isActive: isActive ?? true,
+    })
+
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 })
+    }
+
+    return NextResponse.json(product)
   } catch (error) {
     console.error("Update product error:", error)
     return NextResponse.json({ error: "Failed to update product" }, { status: 500 })
@@ -87,9 +108,13 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const id = searchParams.get("id")
+    const id = Number(searchParams.get("id"))
 
-    await sql`DELETE FROM products WHERE id = ${id}`
+    if (!Number.isInteger(id)) {
+      return NextResponse.json({ error: "Invalid product id" }, { status: 400 })
+    }
+
+    await deleteProduct(id)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Delete product error:", error)

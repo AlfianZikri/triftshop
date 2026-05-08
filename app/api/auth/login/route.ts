@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { sql } from "@/lib/db"
 import { verifyPassword } from "@/lib/auth"
 import { setSession } from "@/lib/session"
+import { findUserByEmail } from "@/lib/store"
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,13 +11,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
     }
 
-    const users = await sql`SELECT id, email, password_hash, full_name FROM users WHERE email = ${email}`
+    const cleanEmail = String(email).trim().toLowerCase()
+    const user = await findUserByEmail(cleanEmail)
 
-    if (users.length === 0) {
+    if (!user) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
     }
 
-    const user = users[0]
     const passwordMatch = await verifyPassword(password, user.password_hash)
 
     if (!passwordMatch) {

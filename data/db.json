@@ -1,0 +1,118 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@thriftshop.test",
+      "password_hash": "$2b$10$hXdhNmabTMed2HUBjd8zr..BKr8Wis6YNOsPGjEcvb52kKbjlWi4S",
+      "full_name": "Admin User",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Vintage Denim Jacket",
+      "description": "Classic 90s blue denim jacket in excellent condition",
+      "price": 45,
+      "category": "Jackets",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 8,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Retro Band T-Shirt",
+      "description": "Worn-in band tee from the 80s era",
+      "price": 25,
+      "category": "Tops",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 12,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Leather Belt",
+      "description": "Brown leather belt with brass buckle",
+      "price": 18,
+      "category": "Accessories",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 15,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "name": "Vintage Plaid Shirt",
+      "description": "Cozy flannel shirt perfect for fall",
+      "price": 22,
+      "category": "Tops",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 10,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "name": "Corduroy Pants",
+      "description": "Corduroy pants with a comfortable vintage fit",
+      "price": 35,
+      "category": "Bottoms",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 7,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 6,
+      "name": "Wool Sweater",
+      "description": "Soft wool sweater from the 70s",
+      "price": 30,
+      "category": "Tops",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 5,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 7,
+      "name": "Canvas Backpack",
+      "description": "Durable canvas backpack with leather straps",
+      "price": 50,
+      "category": "Bags",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 6,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 8,
+      "name": "Vintage Boots",
+      "description": "Black leather boots in timeless style",
+      "price": 65,
+      "category": "Shoes",
+      "image_url": "/placeholder.svg?height=300&width=300",
+      "stock": 4,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "orders": [],
+  "order_items": [],
+  "counters": {
+    "users": 2,
+    "products": 9,
+    "orders": 1,
+    "order_items": 1
+  }
+}

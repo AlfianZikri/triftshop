@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { Trash2, Plus, ArrowLeft } from "lucide-react"
+import { ArrowLeft, PackagePlus, Plus, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface Product {
@@ -18,6 +18,7 @@ interface Product {
   description: string
   price: number
   category: string
+  image_url: string
   stock: number
   is_active: boolean
 }
@@ -35,7 +36,9 @@ export default function AdminDashboard() {
     description: "",
     price: "",
     category: "",
+    imageUrl: "",
     stock: "",
+    isActive: true,
   })
 
   useEffect(() => {
@@ -71,6 +74,7 @@ export default function AdminDashboard() {
         ...formData,
         price: Number.parseFloat(formData.price),
         stock: Number.parseInt(formData.stock),
+        isActive: formData.isActive,
         ...(editingProduct && { id: editingProduct.id }),
       }
 
@@ -96,7 +100,7 @@ export default function AdminDashboard() {
         description: `Product ${editingProduct ? "updated" : "created"} successfully`,
       })
 
-      setFormData({ name: "", description: "", price: "", category: "", stock: "" })
+      setFormData({ name: "", description: "", price: "", category: "", imageUrl: "", stock: "", isActive: true })
       setEditingProduct(null)
       setDialogOpen(false)
       fetchProducts()
@@ -149,20 +153,25 @@ export default function AdminDashboard() {
         description: product.description,
         price: product.price.toString(),
         category: product.category,
+        imageUrl: product.image_url || "",
         stock: product.stock.toString(),
+        isActive: product.is_active,
       })
     } else {
       setEditingProduct(null)
-      setFormData({ name: "", description: "", price: "", category: "", stock: "" })
+      setFormData({ name: "", description: "", price: "", category: "", imageUrl: "", stock: "", isActive: true })
     }
     setDialogOpen(true)
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+      <header className="border-b bg-card shadow-sm">
+        <div className="container mx-auto flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Create, edit, and manage shop inventory</p>
+          </div>
           <Button variant="ghost" onClick={() => router.push("/")} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -171,9 +180,12 @@ export default function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Products</CardTitle>
+        <Card className="shop-surface">
+          <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <PackagePlus className="h-5 w-5 text-primary" />
+              Products
+            </CardTitle>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={() => openDialog()} className="gap-2">
@@ -181,7 +193,7 @@ export default function AdminDashboard() {
                   Add Product
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
                 <DialogHeader>
                   <DialogTitle>{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
                 </DialogHeader>
@@ -202,7 +214,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Label htmlFor="price">Price</Label>
                       <Input
@@ -223,6 +235,15 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div>
+                    <Label htmlFor="imageUrl">Image URL</Label>
+                    <Input
+                      id="imageUrl"
+                      placeholder="/placeholder.svg"
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                    />
+                  </div>
+                  <div>
                     <Label htmlFor="stock">Stock</Label>
                     <Input
                       id="stock"
@@ -231,6 +252,14 @@ export default function AdminDashboard() {
                       onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                     />
                   </div>
+                  <label className="flex items-center gap-2 rounded-md border bg-muted p-3 text-sm font-medium">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    />
+                    Active in storefront
+                  </label>
                   <Button onClick={handleSave} className="w-full">
                     {editingProduct ? "Update" : "Create"}
                   </Button>
@@ -240,15 +269,17 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p>Loading products...</p>
+              <p className="rounded-lg border bg-muted p-4 text-sm font-medium">Loading products...</p>
             ) : (
-              <Table>
+              <div className="overflow-x-auto rounded-lg border">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -259,7 +290,9 @@ export default function AdminDashboard() {
                       <TableCell>{product.category}</TableCell>
                       <TableCell>${product.price.toFixed(2)}</TableCell>
                       <TableCell>{product.stock}</TableCell>
-                      <TableCell className="text-right space-x-2">
+                      <TableCell>{product.is_active ? "Active" : "Hidden"}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex flex-col justify-end gap-2 sm:flex-row">
                         <Button variant="outline" size="sm" onClick={() => openDialog(product)}>
                           Edit
                         </Button>
@@ -272,11 +305,13 @@ export default function AdminDashboard() {
                           <Trash2 className="h-4 w-4" />
                           Delete
                         </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

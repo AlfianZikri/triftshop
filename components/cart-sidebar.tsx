@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trash2, ShoppingCart } from "lucide-react"
+import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface CartItem {
@@ -23,13 +23,12 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
-  // Load cart from localStorage
   useEffect(() => {
+    if (!isOpen) return
+
     const savedCart = localStorage.getItem("thriftshop_cart")
-    if (savedCart) {
-      setCart(JSON.parse(savedCart))
-    }
-  }, [])
+    setCart(savedCart ? JSON.parse(savedCart) : [])
+  }, [isOpen])
 
   // Save cart to localStorage
   useEffect(() => {
@@ -44,7 +43,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     if (quantity <= 0) {
       removeItem(productId)
     } else {
-      setCart(cart.map((item) => (item.productId === productId ? { ...item, quantity } : item)))
+      setCart(cart.map((item) => (item.productId === productId ? { ...item, quantity: Math.min(quantity, 99) } : item)))
     }
   }
 
@@ -71,6 +70,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       }
 
       setCart([])
+      localStorage.setItem("thriftshop_cart", JSON.stringify([]))
       toast({
         title: "Success",
         description: `Order placed! Order ID: ${data.orderId}`,
@@ -91,46 +91,64 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-80 bg-background z-50 shadow-lg overflow-y-auto">
+      <div className="fixed inset-0 bg-foreground z-40" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-full bg-background z-50 shadow-lg overflow-y-auto sm:max-w-sm">
         <Card className="border-0 rounded-none">
           <CardHeader className="border-b">
             <CardTitle className="flex items-center gap-2">
               <ShoppingCart className="h-5 w-5" />
               Shopping Cart
             </CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="absolute right-3 top-3"
+              aria-label="Close cart"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent className="p-4 space-y-4">
             {cart.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">Your cart is empty</p>
+              <div className="rounded-lg border bg-muted p-6 text-center">
+                <ShoppingCart className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                <p className="font-semibold">Your cart is empty</p>
+                <p className="mt-1 text-sm text-muted-foreground">Add a vintage find to get started.</p>
+              </div>
             ) : (
               <>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                   {cart.map((item) => (
-                    <div key={item.productId} className="flex items-center justify-between gap-2 p-2 bg-muted rounded">
+                    <div key={item.productId} className="rounded-lg border bg-card p-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.productName}</p>
                         <p className="text-xs text-muted-foreground">
                           ${item.price.toFixed(2)} x {item.quantity}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                          className="px-2 py-1 text-xs bg-background border rounded hover:bg-muted"
-                        >
-                          -
-                        </button>
-                        <span className="px-2 text-xs font-semibold">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          className="px-2 py-1 text-xs bg-background border rounded hover:bg-muted"
-                        >
-                          +
-                        </button>
+                      <div className="mt-3 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1 rounded-md border bg-background p-1">
+                          <button
+                            onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                            className="flex h-7 w-7 items-center justify-center rounded hover:bg-muted"
+                            aria-label={`Decrease ${item.productName}`}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            className="flex h-7 w-7 items-center justify-center rounded hover:bg-muted"
+                            aria-label={`Increase ${item.productName}`}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
                         <button
                           onClick={() => removeItem(item.productId)}
-                          className="ml-2 p-1 text-red-500 hover:bg-red-50 rounded"
+                          className="flex h-9 w-9 items-center justify-center rounded-md border text-destructive hover:bg-muted"
+                          aria-label={`Remove ${item.productName}`}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -140,7 +158,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 </div>
 
                 <div className="border-t pt-4 space-y-3">
-                  <div className="flex justify-between font-semibold">
+                  <div className="flex justify-between text-lg font-bold">
                     <span>Total:</span>
                     <span>${totalPrice.toFixed(2)}</span>
                   </div>
